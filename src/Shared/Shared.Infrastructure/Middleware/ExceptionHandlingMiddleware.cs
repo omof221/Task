@@ -1,8 +1,8 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shared.Domain.Exceptions;
-using System.Net;
 using System.Text.Json;
 
 namespace Shared.Infrastructure.Middleware;
@@ -46,7 +46,37 @@ public class ExceptionHandlingMiddleware
         int statusCode;
         string title;
 
-        if (exception is DomainException domainEx)
+        if (exception is ValidationException validationEx)
+        {
+            // FluentValidation.ValidationException → 400 Bad Request
+            // ValidationBehavior pipeline'ından fırlatılır
+            statusCode = 400;
+            title      = "Validation Error";
+
+            var validationProblem = new ValidationProblemDetails(
+                validationEx.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()))
+            {
+                Status   = 400,
+                Title    = title,
+                Instance = context.Request.Path
+            };
+
+            context.Response.ContentType = "application/problem+json";
+            context.Response.StatusCode  = 400;
+
+            var vJson = JsonSerializer.Serialize(validationProblem, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(vJson);
+            return;
+        }
+        else if (exception is DomainException domainEx)
         {
             // DomainException → StatusCode domain exception'dan gelir
             // AuthException(401), ProductNotFoundException(404) vb. otomatik desteklenir

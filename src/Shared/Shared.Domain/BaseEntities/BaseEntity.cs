@@ -2,13 +2,14 @@ namespace Shared.Domain.BaseEntities;
 
 /// <summary>
 /// Tüm domain entity'lerinin türediği temel sınıf.
-/// Her entity benzersiz bir Guid Id'ye ve zaman damgalarına sahiptir.
+/// Domain invariantları factory/update metotlarıyla korunur;
+/// EF Core'un property materialization'ı için setterlar public.
 /// </summary>
 public abstract class BaseEntity
 {
-    public Guid Id { get; protected set; } = Guid.NewGuid();
-    public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; protected set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 
     public void SetUpdatedAt() => UpdatedAt = DateTime.UtcNow;
 }
