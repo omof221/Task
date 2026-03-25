@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Shared.Domain.Exceptions;
 using System.Net;
 using System.Text.Json;
 
@@ -10,6 +11,11 @@ namespace Shared.Infrastructure.Middleware;
 /// Tüm servislerde kullanılan merkezi hata yakalama middleware'i.
 /// SRP: Hata yönetimi tek bir noktada toplanır; iş mantığına karışmaz.
 /// Global exception handler — RFC 7807 ProblemDetails formatında yanıt döner.
+///
+/// DIP: Servis-spesifik exception sınıflarını bilmez;
+/// DomainException soyutlaması üzerinden StatusCode'u okur.
+/// OCP: Yeni domain exception'ları DomainException'dan türetilirse
+/// bu middleware değiştirilmeden doğru HTTP yanıtı üretir.
 /// </summary>
 public class ExceptionHandlingMiddleware
 {
@@ -30,32 +36,58 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception occurred: {Message}", ex.Message);
+            _logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
             await HandleExceptionAsync(context, ex);
         }
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        var (statusCode, title) = exception switch
+        int statusCode;
+        string title;
+
+        if (exception is DomainException domainEx)
         {
-            KeyNotFoundException => (HttpStatusCode.NotFound, "Resource Not Found"),
-            UnauthorizedAccessException => (HttpStatusCode.Unauthorized, "Unauthorized"),
-            ArgumentException => (HttpStatusCode.BadRequest, "Bad Request"),
-            InvalidOperationException => (HttpStatusCode.BadRequest, "Invalid Operation"),
-            _ => (HttpStatusCode.InternalServerError, "Internal Server Error")
-        };
+            // DomainException → StatusCode domain exception'dan gelir
+            // AuthException(401), ProductNotFoundException(404) vb. otomatik desteklenir
+            statusCode = domainEx.StatusCode;
+            title = statusCode switch
+            {
+                400 => "Bad Request",
+                401 => "Unauthorized",
+                403 => "Forbidden",
+                404 => "Not Found",
+                409 => "Conflict",
+                422 => "Unprocessable Entity",
+                _ => "Domain Error"
+            };
+        }
+        else
+        {
+            // Framework / infrastructure exception'ları
+            (statusCode, title) = exception switch
+            {
+                KeyNotFoundException => (404, "Not Found"),
+                UnauthorizedAccessException => (401, "Unauthorized"),
+                ArgumentNullException => (400, "Bad Request"),
+                ArgumentException => (400, "Bad Request"),
+                InvalidOperationException => (400, "Invalid Operation"),
+                NotSupportedException => (400, "Not Supported"),
+                OperationCanceledException => (499, "Request Cancelled"),
+                _ => (500, "Internal Server Error")
+            };
+        }
 
         var problem = new ProblemDetails
         {
-            Status = (int)statusCode,
+            Status = statusCode,
             Title = title,
             Detail = exception.Message,
             Instance = context.Request.Path
         };
 
         context.Response.ContentType = "application/problem+json";
-        context.Response.StatusCode = (int)statusCode;
+        context.Response.StatusCode = statusCode;
 
         var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions
         {
