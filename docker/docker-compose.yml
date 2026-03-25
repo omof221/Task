@@ -1,0 +1,183 @@
+version: "3.9"
+
+# 12-Factor: Tüm destek servisleri bağımsız container'larda tanımlanır
+# Konfigürasyon ortam değişkenleri ile yönetilir (Config faktörü)
+
+services:
+  # ─── Altyapı Servisleri ───────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ms_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-msuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mspassword}
+      POSTGRES_DB: ${POSTGRES_DB:-microservices}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-msuser}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: ms_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - microservices_net
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ms_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"   # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - microservices_net
+
+  seq:
+    image: datalust/seq:latest
+    container_name: ms_seq
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - "5341:5341"   # Ingest
+      - "5342:80"     # Web UI
+    volumes:
+      - seq_data:/data
+    networks:
+      - microservices_net
+
+  # ─── Uygulama Servisleri ──────────────────────────────────────────
+  auth-service:
+    build:
+      context: ..
+      dockerfile: src/AuthService/AuthService.API/Dockerfile
+    container_name: ms_auth
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=authdb;Username=${POSTGRES_USER:-msuser};Password=${POSTGRES_PASSWORD:-mspassword}"
+      Jwt__Secret: ${JWT_SECRET:-SuperSecretKeyForJwtTokenGeneration2024!}
+      Jwt__Issuer: ${JWT_ISSUER:-MicroserviceAuth}
+      Jwt__Audience: ${JWT_AUDIENCE:-MicroserviceClients}
+      Jwt__ExpiryMinutes: ${JWT_EXPIRY_MINUTES:-60}
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5001:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      seq:
+        condition: service_started
+    networks:
+      - microservices_net
+
+  product-service:
+    build:
+      context: ..
+      dockerfile: src/ProductService/ProductService.API/Dockerfile
+    container_name: ms_product
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=productdb;Username=${POSTGRES_USER:-msuser};Password=${POSTGRES_PASSWORD:-mspassword}"
+      Redis__ConnectionString: redis:6379
+      RabbitMq__ConnectionString: "amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672/"
+      Jwt__Secret: ${JWT_SECRET:-SuperSecretKeyForJwtTokenGeneration2024!}
+      Jwt__Issuer: ${JWT_ISSUER:-MicroserviceAuth}
+      Jwt__Audience: ${JWT_AUDIENCE:-MicroserviceClients}
+      Seq__ServerUrl: http://seq:5341
+    ports:
+      - "5002:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - microservices_net
+
+  log-service:
+    build:
+      context: ..
+      dockerfile: src/LogService/LogService.API/Dockerfile
+    container_name: ms_log
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      RabbitMq__ConnectionString: "amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672/"
+      Seq__ServerUrl: http://seq:5341
+      Elasticsearch__Uri: ${ELASTICSEARCH_URI:-http://elasticsearch:9200}
+    ports:
+      - "5003:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      seq:
+        condition: service_started
+    networks:
+      - microservices_net
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: src/Gateway/Dockerfile
+    container_name: ms_gateway
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Jwt__Secret: ${JWT_SECRET:-SuperSecretKeyForJwtTokenGeneration2024!}
+      Jwt__Issuer: ${JWT_ISSUER:-MicroserviceAuth}
+      Jwt__Audience: ${JWT_AUDIENCE:-MicroserviceClients}
+    ports:
+      - "5000:8080"
+    depends_on:
+      - auth-service
+      - product-service
+      - log-service
+    networks:
+      - microservices_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: ms_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - gateway
+    networks:
+      - microservices_net
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  seq_data:
+
+networks:
+  microservices_net:
+    driver: bridge

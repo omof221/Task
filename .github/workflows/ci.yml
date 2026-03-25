@@ -1,0 +1,91 @@
+name: CI — Build & Test
+
+on:
+  push:
+    branches:
+      - "test/**"
+      - "prod/**"
+      - "feature/**"
+  pull_request:
+    branches:
+      - "test/**"
+      - "prod/**"
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # NuGet cache — build sürelerini kısaltır
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore MicroserviceSolution.sln
+
+      - name: Build solution
+        run: dotnet build MicroserviceSolution.sln --no-restore -c Release
+
+      - name: Run unit tests
+        run: |
+          dotnet test tests/AuthService.Tests/AuthService.Tests.csproj \
+            --no-build -c Release \
+            --logger "trx;LogFileName=auth-tests.trx" \
+            --results-directory ./test-results
+
+          dotnet test tests/ProductService.Tests/ProductService.Tests.csproj \
+            --no-build -c Release \
+            --logger "trx;LogFileName=product-tests.trx" \
+            --results-directory ./test-results
+
+          dotnet test tests/LogService.Tests/LogService.Tests.csproj \
+            --no-build -c Release \
+            --logger "trx;LogFileName=log-tests.trx" \
+            --results-directory ./test-results
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: ./test-results/*.trx
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore MicroserviceSolution.sln
+
+      - name: Check for build warnings (treat as errors in CI)
+        run: dotnet build MicroserviceSolution.sln --no-restore -c Release /warnaserror
+        continue-on-error: true
