@@ -4,13 +4,13 @@ using Serilog;
 using Serilog.Events;
 using Shared.Infrastructure.Middleware;
 
-// ── Serilog bootstrap ──────────────────────────────────────────────────────
+// ── Serilog bootstrap (sadece Console — Seq/ELK bağlantısı henüz yok) ────
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .WriteTo.Console(outputTemplate:
-        "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateBootstrapLogger();
 
 try
@@ -20,20 +20,29 @@ try
     // ── Serilog tam konfigürasyonu ─────────────────────────────────────────
     builder.Host.UseSerilog((ctx, services, cfg) =>
     {
-        var seqUrl      = ctx.Configuration["Seq:Url"]           ?? "http://localhost:5341";
-        var elasticUrl  = ctx.Configuration["Elastic:Url"]       ?? "http://localhost:9200";
-        var elasticIdx  = ctx.Configuration["Elastic:IndexName"] ?? "logservice-{0:yyyy.MM}";
+        var seqUrl     = ctx.Configuration["Seq:Url"]           ?? "http://localhost:5341";
+        var elasticUrl = ctx.Configuration["Elastic:Url"]       ?? "http://localhost:9200";
+        var elasticIdx = ctx.Configuration["Elastic:IndexName"] ?? "logservice-{0:yyyy.MM}";
 
-        cfg
-            .ReadFrom.Configuration(ctx.Configuration)
-            .ReadFrom.Services(services)
-            .Enrich.FromLogContext()
-            // INFO + WARNING → Seq
-            .WriteTo.Seq(seqUrl, restrictedToMinimumLevel: LogEventLevel.Information)
-            // ERROR + CRITICAL → Elasticsearch
-            .WriteTo.Elasticsearch(elasticUrl, indexFormat: elasticIdx,
-                restrictedToMinimumLevel: LogEventLevel.Error)
-            .WriteTo.Console();
+        // Her zaman Console'a yaz
+        cfg.ReadFrom.Configuration(ctx.Configuration)
+           .ReadFrom.Services(services)
+           .Enrich.FromLogContext()
+           .WriteTo.Console();
+
+        // Seq ayakta mı? URI geçerli mi? → sadece o zaman ekle
+        if (Uri.TryCreate(seqUrl, UriKind.Absolute, out _))
+        {
+            cfg.WriteTo.Seq(seqUrl, restrictedToMinimumLevel: LogEventLevel.Information);
+        }
+
+        // Elasticsearch URI geçerli mi? → sadece o zaman ekle
+        if (Uri.TryCreate(elasticUrl, UriKind.Absolute, out _))
+        {
+            cfg.WriteTo.Elasticsearch(elasticUrl,
+                indexFormat: elasticIdx,
+                restrictedToMinimumLevel: LogEventLevel.Error);
+        }
     });
 
     // ── DI kayıtları ───────────────────────────────────────────────────────
@@ -55,7 +64,6 @@ try
     var app = builder.Build();
 
     app.UseMiddleware<ExceptionHandlingMiddleware>();
-
     app.UseSerilogRequestLogging();
 
     if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing"))
