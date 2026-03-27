@@ -27,9 +27,9 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: "http://+:8080"
 
-  postgres:
+  mssql:
     ports:
-      - "5432:5432"
+      - "1433:1433"
 
   redis:
     ports:
