@@ -19,9 +19,9 @@ using Shared.Infrastructure.Middleware;
 // ─────────────────────────────────────────────────────────────
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Veritabanı (PostgreSQL + EF Core) ────────────────────────
+// ── Veritabanı (SQL Server + EF Core) ────────────────────────
 // 12-Factor IV — Backing services bağımsız servisler olarak ele alınır
-// "Testing" ortamında InMemory kullanılır; Npgsql provider çakışması olmaz.
+// "Testing" ortamında InMemory kullanılır; SqlServer provider çakışması olmaz.
 if (builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddDbContext<AuthDbContext>(options =>
@@ -30,7 +30,7 @@ if (builder.Environment.IsEnvironment("Testing"))
 else
 {
     builder.Services.AddDbContext<AuthDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
 // ── Microsoft Identity ────────────────────────────────────────
@@ -140,13 +140,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 // ── Health Checks ─────────────────────────────────────────────
-// NpgSql health check sadece gerçek DB bağlantısı olan ortamlarda aktif
+// SqlServer health check sadece gerçek DB bağlantısı olan ortamlarda aktif
 var healthChecks = builder.Services.AddHealthChecks();
 if (!builder.Environment.IsEnvironment("Testing"))
 {
-    healthChecks.AddNpgSql(
+    healthChecks.AddSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection") ?? string.Empty,
-        name: "postgresql",
+        name: "sqlserver",
         tags: ["db", "auth"]);
 }
 

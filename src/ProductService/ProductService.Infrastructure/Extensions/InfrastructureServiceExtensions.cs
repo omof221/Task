@@ -34,7 +34,7 @@ public static class InfrastructureServiceExtensions
         else
         {
             services.AddDbContext<ProductDbContext>(opt =>
-                opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+                opt.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
         }
 
         // ── Repository ────────────────────────────────────────────

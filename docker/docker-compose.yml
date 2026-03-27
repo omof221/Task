@@ -5,22 +5,22 @@ version: "3.9"
 
 services:
   # ─── Altyapı Servisleri ───────────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    container_name: ms_postgres
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ms_mssql
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-msuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mspassword}
-      POSTGRES_DB: ${POSTGRES_DB:-microservices}
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SA_PASSWORD:-YourStrong!Passw0rd}
+      MSSQL_PID: Express
     ports:
-      - "5432:5432"
+      - "1433:1433"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mssql_data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-msuser}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD:-YourStrong!Passw0rd}' -Q 'SELECT 1' -No -C"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
     networks:
       - microservices_net
 
@@ -79,7 +79,7 @@ services:
     container_name: ms_auth
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=authdb;Username=${POSTGRES_USER:-msuser};Password=${POSTGRES_PASSWORD:-mspassword}"
+      ConnectionStrings__DefaultConnection: "Server=mssql,1433;Database=AuthDb;User Id=sa;Password=${SA_PASSWORD:-YourStrong!Passw0rd};TrustServerCertificate=True;MultipleActiveResultSets=True;"
       Jwt__Secret: ${JWT_SECRET:-SuperSecretKeyForJwtTokenGeneration2024!}
       Jwt__Issuer: ${JWT_ISSUER:-MicroserviceAuth}
       Jwt__Audience: ${JWT_AUDIENCE:-MicroserviceClients}
@@ -88,7 +88,7 @@ services:
     ports:
       - "5001:8080"
     depends_on:
-      postgres:
+      mssql:
         condition: service_healthy
       seq:
         condition: service_started
@@ -102,7 +102,7 @@ services:
     container_name: ms_product
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=productdb;Username=${POSTGRES_USER:-msuser};Password=${POSTGRES_PASSWORD:-mspassword}"
+      ConnectionStrings__DefaultConnection: "Server=mssql,1433;Database=ProductDb;User Id=sa;Password=${SA_PASSWORD:-YourStrong!Passw0rd};TrustServerCertificate=True;MultipleActiveResultSets=True;"
       Redis__ConnectionString: redis:6379
       RabbitMq__ConnectionString: "amqp://${RABBITMQ_USER:-guest}:${RABBITMQ_PASSWORD:-guest}@rabbitmq:5672/"
       Jwt__Secret: ${JWT_SECRET:-SuperSecretKeyForJwtTokenGeneration2024!}
@@ -112,7 +112,7 @@ services:
     ports:
       - "5002:8080"
     depends_on:
-      postgres:
+      mssql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -173,7 +173,7 @@ services:
       - microservices_net
 
 volumes:
-  postgres_data:
+  mssql_data:
   redis_data:
   rabbitmq_data:
   seq_data:
