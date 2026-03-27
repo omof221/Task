@@ -163,13 +163,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
+  
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthService v1");
-        options.RoutePrefix = string.Empty; // Swagger root'ta açılır
+
+        
     });
 }
 
 // 12-Factor VII — Port Binding
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

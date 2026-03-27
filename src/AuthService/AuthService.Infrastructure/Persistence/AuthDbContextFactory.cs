@@ -3,12 +3,9 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace AuthService.Infrastructure.Persistence;
 
-/// <summary>
-/// EF Core design-time (dotnet ef migrations) için DbContext factory.
+
 /// Migration araçları tam uygulama başlangıcı olmadan AuthDbContext oluşturur.
-/// Bağlantı dizesi AUTH_DB_CONNECTION env var üzerinden veya
-/// varsayılan .\SQLEXPRESS adresi ile sağlanır.
-/// </summary>
+
 public sealed class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
 {
     public AuthDbContext CreateDbContext(string[] args)

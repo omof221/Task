@@ -8,18 +8,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AuthService.Infrastructure.Services;
-
-/// <summary>
-/// ITokenService arayüzünün JWT implementasyonu.
-///
 /// DIP: Application katmanı ITokenService'e bağımlıdır; bu somut sınıfa değil.
 /// SRP: Yalnızca JWT ve refresh token üretiminden sorumludur.
-///
-/// Güvenlik kararları:
-/// - Access token: HMAC-SHA256 imzalı, 15 dakika ömürlü
-/// - Refresh token: 32-byte kriptografik rastgele değer, 7 gün ömürlü
-/// - Secret key ortam değişkeninden alınır (12-Factor III)
-/// </summary>
+/// Refresh token 32 byte 7 gün ömürlü kriptografik rastgele değerdir.
+
+
 public sealed class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
@@ -29,7 +22,6 @@ public sealed class TokenService : ITokenService
         _configuration = configuration;
     }
 
-    /// <inheritdoc />
     public string GenerateAccessToken(AppUser user, IList<string> roles)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");

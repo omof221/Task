@@ -1,6 +1,5 @@
 namespace AuthService.Domain.Entities;
 
-/// Refresh token domain entity'si.
 
 public class RefreshToken
 {

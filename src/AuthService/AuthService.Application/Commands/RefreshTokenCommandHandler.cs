@@ -6,19 +6,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthService.Application.Commands;
 
-/// <summary>
+
 /// RefreshTokenCommand'ı işleyen MediatR handler.
-///
-/// SRP: Yalnızca token yenileme iş akışından sorumludur.
-///   1) Refresh token'ı veritabanında bul ve aktifliğini doğrula
-///   2) Kullanıcıyı yükle
-///   3) Eski token'ı iptal et (rotation stratejisi)
-///   4) Yeni access token + refresh token üret
-///   5) Yeni refresh token'ı kaydet
-///
-/// Token Rotation: Her kullanımda eski token revoke edilir;
-/// bu sayede çalınan token'ların tekrar kullanımı engellenir.
-/// </summary>
+
 public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, TokenResponse>
 {
     private readonly IRefreshTokenRepository _refreshTokenRepository;
@@ -48,7 +38,7 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
         var user = await _userManager.FindByIdAsync(storedToken.UserId)
             ?? throw AuthException.InvalidToken();
 
-        // 3. Eski token'ı revoke et (Token Rotation Pattern)
+        // 3. Eski token'ı revoke et 
         await _refreshTokenRepository.RevokeAsync(request.RefreshToken, cancellationToken);
 
         // 4. Yeni token'lar üret
@@ -56,7 +46,7 @@ public sealed class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCom
         var newAccessToken = _tokenService.GenerateAccessToken(user, roles);
         var newRefreshToken = _tokenService.GenerateRefreshToken(user.Id);
 
-        // 5. Yeni refresh token'ı kaydet
+        // 5. Yeni refresh token kaydet
         await _refreshTokenRepository.AddAsync(newRefreshToken, cancellationToken);
         await _refreshTokenRepository.SaveChangesAsync(cancellationToken);
 

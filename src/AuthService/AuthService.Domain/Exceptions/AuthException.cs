@@ -2,14 +2,7 @@ using Shared.Domain.Exceptions;
 
 namespace AuthService.Domain.Exceptions;
 
-/// <summary>
-/// AuthService domain'ine özgü hata sınıfı.
-/// DomainException'dan türetilir; ExceptionHandlingMiddleware
-/// StatusCode'u okuyarak doğru HTTP yanıtı üretir.
-///
-/// OCP: Yeni hata türleri bu sınıftan türetilerek sisteme eklenir;
-/// mevcut kod değiştirilmez.
-/// </summary>
+
 public class AuthException : DomainException
 {
     public AuthException(string message, int statusCode = 400)
@@ -17,8 +10,6 @@ public class AuthException : DomainException
 
     public AuthException(string message, Exception innerException, int statusCode = 400)
         : base(message, innerException, statusCode) { }
-
-    // --- Fabrika metotları ---
 
     public static AuthException InvalidCredentials()
         => new("Kullanıcı adı veya şifre hatalı.", 401);

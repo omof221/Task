@@ -6,18 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.API.Controllers;
 
-/// <summary>
-/// Kimlik doğrulama endpoint'leri.
-///
-/// SRP: Controller yalnızca HTTP iletişimini yönetir;
-/// iş mantığı MediatR komutları aracılığıyla Application katmanına devredilir.
-///
-/// Endpoint'ler:
-///   POST /api/auth/register  — Yeni kullanıcı kaydı
-///   POST /api/auth/login     — Giriş → JWT + Refresh Token
-///   POST /api/auth/refresh   — Access token yenileme
-///   GET  /api/auth/me        — Mevcut kullanıcı bilgisi (test endpoint)
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -30,11 +18,7 @@ public sealed class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// Yeni kullanıcı kaydeder ve JWT token döner.
-    /// </summary>
-    /// <param name="request">Kayıt bilgileri (FullName, Email, Password, Role).</param>
-    /// <returns>Access token ve refresh token.</returns>
+
     [HttpPost("register")]
     [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,11 +51,6 @@ public sealed class AuthController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Refresh token kullanarak yeni access token üretir (Token Rotation).
-    /// </summary>
-    /// <param name="refreshToken">Mevcut refresh token değeri.</param>
-    /// <returns>Yeni access token ve refresh token.</returns>
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -82,9 +61,6 @@ public sealed class AuthController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Geçerli JWT ile mevcut kullanıcı claim'lerini döner (test endpoint).
-    /// </summary>
     [HttpGet("me")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]

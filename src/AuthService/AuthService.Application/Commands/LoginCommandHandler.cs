@@ -6,19 +6,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthService.Application.Commands;
 
-/// <summary>
-/// LoginCommand'ı işleyen MediatR handler.
-///
-/// SRP: Yalnızca giriş iş akışından sorumludur.
-///   1) Kullanıcıyı e-posta ile bul
-///   2) Şifreyi doğrula
-///   3) Rolleri getir
-///   4) Access token + Refresh token üret
-///   5) Refresh token'ı kaydet
-///
-/// DIP: UserManager, ITokenService, IRefreshTokenRepository
-///      soyutlamalar üzerinden enjekte edilir; somut sınıflara bağımlılık yoktur.
-/// </summary>
 public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, TokenResponse>
 {
     private readonly UserManager<Domain.Entities.AppUser> _userManager;

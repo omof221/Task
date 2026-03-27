@@ -7,19 +7,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthService.Application.Commands;
 
-/// <summary>
+
 /// RegisterCommand'ı işleyen MediatR handler.
-///
-/// SRP: Yalnızca kullanıcı kayıt iş akışından sorumludur.
-///   1) E-posta çakışması kontrolü
-///   2) AppUser entity'si oluştur
-///   3) Identity ile kullanıcı kaydet
-///   4) Role ata
-///   5) Access token + Refresh token üret → döndür
-///
-/// DIP: UserManager, RoleManager, ITokenService, IRefreshTokenRepository
-///      soyutlamalar üzerinden enjekte edilir.
-/// </summary>
+
 public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, TokenResponse>
 {
     private readonly UserManager<AppUser> _userManager;
@@ -60,7 +50,7 @@ public sealed class RegisterCommandHandler : IRequestHandler<RegisterCommand, To
         if (!result.Succeeded)
             throw AuthException.RegistrationFailed(result.Errors.Select(e => e.Description));
 
-        // 4. Rolü oluştur (yoksa) ve kullanıcıya ata
+        // 4. Rolü oluştur  ve kullanıcıya ata
         if (!await _roleManager.RoleExistsAsync(request.Role))
             await _roleManager.CreateAsync(new IdentityRole(request.Role));
 
