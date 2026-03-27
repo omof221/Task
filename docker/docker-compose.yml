@@ -1,8 +1,5 @@
 version: "3.9"
 
-# 12-Factor: Tüm destek servisleri bağımsız container'larda tanımlanır
-# Konfigürasyon ortam değişkenleri ile yönetilir (Config faktörü)
-
 services:
   # ─── Altyapı Servisleri ───────────────────────────────────────────
   mssql:
@@ -61,11 +58,15 @@ services:
   seq:
     image: datalust/seq:latest
     container_name: ms_seq
+    restart: always
     environment:
-      ACCEPT_EULA: "Y"
+      - ACCEPT_EULA=Y
+      # Seq 2024+ zorunlu: ya şifre ver ya da auth'u kapat
+      # Geliştirme ortamı için auth kapalı (production'da şifre koy)
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
     ports:
-      - "5341:5341"   # Ingest
-      - "5342:80"     # Web UI
+      - "5342:80"       # UI Portu
+      - "5341:5341"     # Log Alım Portu
     volumes:
       - seq_data:/data
     networks:
