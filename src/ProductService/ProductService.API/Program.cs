@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using ProductService.Application.Extensions;
 using ProductService.Infrastructure.Extensions;
+using Shared.Infrastructure.Authorization.Handlers;
+using Shared.Infrastructure.Authorization.Requirements;
 using Shared.Infrastructure.Middleware;
 using System.Text;
 
@@ -46,12 +48,20 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
         };
     });
 
-// ── Authorization ─────────────────────────────────────────────
+// ── Role-Based + Policy-Based Authorization ───────────────────
+// Custom HasRoleRequirement + HasRoleHandler (Shared.Infrastructure)
+// Yetkilendirme kararları handler'da loglanır (SRP/OCP/DIP).
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly",   policy => policy.RequireRole("Admin"));
-    options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
+    options.AddPolicy("AdminOnly", policy =>
+        policy.Requirements.Add(new HasRoleRequirement("Admin")));
+
+    options.AddPolicy("UserOrAdmin", policy =>
+        policy.Requirements.Add(new HasRoleRequirement("User", "Admin")));
 });
+
+// Custom handler DI kaydı (IAuthorizationHandler arayüzü üzerinden)
+builder.Services.AddSingleton<IAuthorizationHandler, HasRoleHandler>();
 
 // ── Controllers + Swagger ─────────────────────────────────────
 builder.Services.AddControllers();

@@ -58,14 +58,16 @@ public class ProductController : ControllerBase
     }
 
     /// <summary>
-    /// Ürün günceller — JWT [Authorize] gerektirir.
+    /// Ürün günceller — "UserOrAdmin" policy gerektirir.
+    /// Custom HasRoleHandler devreye girer; yetki kararı loglanır.
     /// Event: ProductUpdatedEvent → RabbitMQ/Kafka → LogService.
     /// Cache Invalidation: Hem liste hem tekil cache silinir.
     /// </summary>
     [HttpPut("{id:guid}")]
-    [Authorize]
+    [Authorize(Policy = "UserOrAdmin")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProductRequest request, CancellationToken ct)
     {

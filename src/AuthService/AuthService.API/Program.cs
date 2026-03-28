@@ -6,10 +6,13 @@ using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Shared.Infrastructure.Authorization.Handlers;
+using Shared.Infrastructure.Authorization.Requirements;
 using Shared.Infrastructure.Middleware;
 
 // ─────────────────────────────────────────────────────────────
@@ -82,13 +85,22 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
         };
     });
 
-// ── Role & Policy Based Authorization ────────────────────────
+// ── Role-Based + Policy-Based Authorization ───────────────────
 // Ekstra değerlendirme kriteri: farklı yetki seviyeleri
+// Custom HasRoleRequirement + HasRoleHandler kullanılır.
+// Standart RequireRole()'den farkı: yetkilendirme kararları
+// loglara yazılır ve iş kuralı handler'da merkezi yönetilir (OCP/SRP).
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("UserOrAdmin", policy => policy.RequireRole("User", "Admin"));
+    options.AddPolicy("AdminOnly", policy =>
+        policy.Requirements.Add(new HasRoleRequirement("Admin")));
+
+    options.AddPolicy("UserOrAdmin", policy =>
+        policy.Requirements.Add(new HasRoleRequirement("User", "Admin")));
 });
+
+// Custom handler DI'a kayıt (DIP: IAuthorizationHandler arayüzü üzerinden)
+builder.Services.AddSingleton<IAuthorizationHandler, HasRoleHandler>();
 
 // ── MediatR (CQRS) ───────────────────────────────────────────
 // LoginCommand, RegisterCommand, RefreshTokenCommand handler'larını tarar
