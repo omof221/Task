@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Infrastructure.Persistence;
 
-
+//
 public class AuthDbContext : IdentityDbContext<AppUser, IdentityRole, string>
 {
     public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options) { }
