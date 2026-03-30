@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 
 namespace ProductService.Application.Behaviors;
 
-/// <summary>
+
 /// MediatR pipeline behavior — otomatik request/response loglama.
 /// SRP: Log sorumluluğu handler'lardan ayrıştırılır.
 /// Her MediatR isteği için istek adı, süre ve başarı/hata bilgisi loglanır.
-/// </summary>
+
 public sealed class LoggingBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

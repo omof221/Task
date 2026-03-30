@@ -5,12 +5,10 @@ using System.Text.Json;
 
 namespace ProductService.Infrastructure.Cache;
 
-/// <summary>
 /// ICacheService'in Redis implementasyonu (StackExchange.Redis).
 /// DIP: Application katmanı ICacheService'e bağımlıdır, bu sınıfa değil.
 /// Cache-Aside pattern'ı destekler: Get → miss → DB → Set.
 /// Redis erişim hatalarında loglayıp null döner (graceful degradation).
-/// </summary>
 public sealed class RedisCacheService : ICacheService
 {
     private readonly IConnectionMultiplexer _redis;

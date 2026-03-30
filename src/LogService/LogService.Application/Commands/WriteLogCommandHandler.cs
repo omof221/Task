@@ -4,11 +4,10 @@ using MediatR;
 
 namespace LogService.Application.Commands;
 
-/// <summary>
 /// WriteLogCommand handler'ı.
-/// SRP: depolama + seviye bazlı yönlendirme bu sınıfta koordine edilir.
-/// DIP: Infrastructure'a değil arayüzlere bağımlıdır.
-/// </summary>
+/// depolama + seviye bazlı yönlendirme bu sınıfta koordine edilir.
+/// Infrastructure'a değil arayüzlere bağımlıdır.
+
 public sealed class WriteLogCommandHandler : IRequestHandler<WriteLogCommand, Guid>
 {
     private readonly ILogRepository    _repository;

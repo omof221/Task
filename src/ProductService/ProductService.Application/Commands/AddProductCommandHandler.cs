@@ -6,11 +6,10 @@ using ProductService.Domain.Events;
 
 namespace ProductService.Application.Commands;
 
-/// <summary>
+
 /// AddProductCommand handler'ı.
 /// SRP: Yalnızca ürün oluşturma iş akışını yönetir.
 /// Akış: DB'ye async yaz → event yayımla → cache'i geçersiz kıl.
-/// </summary>
 public sealed class AddProductCommandHandler : IRequestHandler<AddProductCommand, ProductDto>
 {
     private readonly IProductRepository _productRepository;

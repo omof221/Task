@@ -6,12 +6,11 @@ using ProductService.Domain.Exceptions;
 
 namespace ProductService.Application.Commands;
 
-/// <summary>
 /// UpdateProductCommand handler'ı.
 /// SRP: Güncelleme iş akışını yönetir.
 /// Akış: Ürünü bul → domain update → DB kaydet → event yayımla → cache temizle.
 /// Cache Invalidation: Hem liste hem de tekil ürün cache'i silinir.
-/// </summary>
+
 public sealed class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, ProductDto>
 {
     private readonly IProductRepository _productRepository;

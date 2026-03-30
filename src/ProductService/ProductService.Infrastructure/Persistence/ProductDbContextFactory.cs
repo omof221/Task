@@ -3,13 +3,11 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace ProductService.Infrastructure.Persistence;
 
-/// <summary>
 /// EF Core design-time (dotnet ef migrations) için DbContext factory.
 /// Migration araçları uygulama başlangıcını (Redis, RabbitMQ vb.) tetiklemeden
 /// doğrudan ProductDbContext oluşturabilir.
 /// Bağlantı dizesi PRODUCT_DB_CONNECTION env var üzerinden veya
 /// varsayılan .\SQLEXPRESS adresi ile sağlanır.
-/// </summary>
 public sealed class ProductDbContextFactory : IDesignTimeDbContextFactory<ProductDbContext>
 {
     public ProductDbContext CreateDbContext(string[] args)

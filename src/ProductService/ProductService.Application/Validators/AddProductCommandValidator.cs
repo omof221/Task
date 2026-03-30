@@ -3,11 +3,9 @@ using ProductService.Application.Commands;
 
 namespace ProductService.Application.Validators;
 
-/// <summary>
 /// AddProductCommand için FluentValidation kuralları.
 /// SRP: Validation mantığı tek sınıfta toplandı.
 /// ValidationBehavior pipeline'ı bu validator'ı handler çalışmadan önce tetikler.
-/// </summary>
 public sealed class AddProductCommandValidator : AbstractValidator<AddProductCommand>
 {
     public AddProductCommandValidator()

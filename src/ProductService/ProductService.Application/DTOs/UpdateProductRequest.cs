@@ -1,6 +1,6 @@
 namespace ProductService.Application.DTOs;
 
-/// <summary>Ürün güncelleme istek DTO'su.</summary>
+/// Ürün güncelleme istek DTO'su
 public sealed record UpdateProductRequest(
     string Name,
     string Description,

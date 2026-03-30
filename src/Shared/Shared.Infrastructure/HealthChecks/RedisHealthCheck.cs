@@ -3,10 +3,9 @@ using StackExchange.Redis;
 
 namespace Shared.Infrastructure.HealthChecks;
 
-/// <summary>
+
 /// Redis bağlantısını kontrol eden health check.
-/// 12-Factor: Bağımlı servislerin sağlığı merkezi olarak izlenir.
-/// </summary>
+
 public class RedisHealthCheck : IHealthCheck
 {
     private readonly IConnectionMultiplexer _redis;

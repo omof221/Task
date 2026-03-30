@@ -2,15 +2,9 @@ using AuthService.Domain.Entities;
 
 namespace AuthService.Application.Interfaces;
 
-/// <summary>
+
 /// Refresh token veri erişim kontratı.
-///
-/// ISP: Yalnızca refresh token CRUD operasyonlarını içerir;
-/// kullanıcı repository'si ile karıştırılmaz.
-///
-/// DIP: Infrastructure katmanındaki somut implementasyona
-/// Application katmanından bağımlılık oluşmaz.
-/// </summary>
+
 public interface IRefreshTokenRepository
 {
     /// <summary>Token değerine göre aktif refresh token'ı getirir.</summary>

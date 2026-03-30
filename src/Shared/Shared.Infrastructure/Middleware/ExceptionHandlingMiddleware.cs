@@ -7,16 +7,12 @@ using System.Text.Json;
 
 namespace Shared.Infrastructure.Middleware;
 
-/// <summary>
+
 /// Tüm servislerde kullanılan merkezi hata yakalama middleware'i.
 /// SRP: Hata yönetimi tek bir noktada toplanır; iş mantığına karışmaz.
 /// Global exception handler — RFC 7807 ProblemDetails formatında yanıt döner.
-///
-/// DIP: Servis-spesifik exception sınıflarını bilmez;
-/// DomainException soyutlaması üzerinden StatusCode'u okur.
-/// OCP: Yeni domain exception'ları DomainException'dan türetilirse
-/// bu middleware değiştirilmeden doğru HTTP yanıtı üretir.
-/// </summary>
+
+
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;

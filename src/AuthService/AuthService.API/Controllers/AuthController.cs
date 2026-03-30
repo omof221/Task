@@ -41,11 +41,7 @@ public sealed class AuthController : ControllerBase
         return CreatedAtAction(nameof(Me), null, result);
     }
 
-    /// <summary>
-    /// Kullanıcı girişi yapar ve JWT token döner.
-    /// </summary>
-    /// <param name="request">Giriş bilgileri (Email, Password).</param>
-    /// <returns>Access token ve refresh token.</returns>
+ 
     [HttpPost("login")]
     [ProducesResponseType(typeof(TokenResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -80,12 +76,7 @@ public sealed class AuthController : ControllerBase
         return Ok(new { UserId = userId, Email = email, Roles = roles });
     }
 
-    /// <summary>
-    /// Sistemdeki tüm kullanıcıları listeler.
-    /// Yalnızca "Admin" rolüne sahip kullanıcılar erişebilir.
-    /// Custom HasRoleHandler devreye girer; yetki kararı loglanır.
-    /// Policy-Based Authorization demo endpoint'i.
-    /// </summary>
+
     [HttpGet("admin/users")]
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType(StatusCodes.Status200OK)]

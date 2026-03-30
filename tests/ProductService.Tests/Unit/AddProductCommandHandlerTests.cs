@@ -7,10 +7,8 @@ using ProductService.Domain.Entities;
 
 namespace ProductService.Tests.Unit;
 
-/// <summary>
 /// AddProductCommandHandler unit testleri.
 /// Tüm bağımlılıklar Moq ile izole edilmiştir (SRP / DIP doğrulaması).
-/// </summary>
 public class AddProductCommandHandlerTests
 {
     private readonly Mock<IProductRepository> _repoMock;

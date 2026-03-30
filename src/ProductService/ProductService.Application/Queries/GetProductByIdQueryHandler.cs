@@ -5,10 +5,8 @@ using ProductService.Domain.Exceptions;
 
 namespace ProductService.Application.Queries;
 
-/// <summary>
 /// GetProductByIdQuery handler'ı — tekil ürün için Cache-Aside.
 /// Cache miss durumunda DB'den yükler; bulunamazsa 404 exception.
-/// </summary>
 public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
 {
     private readonly IProductRepository _productRepository;

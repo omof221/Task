@@ -7,11 +7,11 @@ using Moq;
 
 namespace LogService.Tests.Unit;
 
-/// <summary>
+
 /// WriteLogCommandHandler birim testleri.
 /// SRP: Her test tek bir davranışı doğrular.
 /// Moq: ILogRepository ve IStructuredLogger izole edilir.
-/// </summary>
+
 public class WriteLogCommandHandlerTests
 {
     private readonly Mock<ILogRepository>    _repoMock   = new();

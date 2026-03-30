@@ -4,7 +4,6 @@ using ProductService.Application.Interfaces;
 
 namespace ProductService.Application.Queries;
 
-/// <summary>
 /// GetProductsQuery handler'ı — Redis Cache-Aside Pattern.
 /// Akış:
 ///   1. Redis'te ara (cache hit) → varsa doğrudan dön
@@ -12,7 +11,6 @@ namespace ProductService.Application.Queries;
 ///   3. Redis'e yaz (cache populate)
 ///   4. DTO listesi döndür
 /// SRP: Yalnızca listeleme iş akışını yönetir.
-/// </summary>
 public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, IReadOnlyList<ProductDto>>
 {
     private readonly IProductRepository _productRepository;

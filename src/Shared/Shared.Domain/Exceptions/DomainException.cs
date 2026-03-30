@@ -1,6 +1,5 @@
 namespace Shared.Domain.Exceptions;
 
-/// <summary>
 /// Tüm domain exception'larının türediği temel sınıf.
 /// HTTP status code bilgisini taşır; böylece ExceptionHandlingMiddleware
 /// domain-spesifik sınıfları bilmeden doğru HTTP yanıtı üretebilir.
@@ -10,10 +9,9 @@ namespace Shared.Domain.Exceptions;
 ///
 /// DIP: Shared.Infrastructure, servis-spesifik exception'lara değil
 /// bu soyutlamaya bağımlıdır.
-/// </summary>
 public abstract class DomainException : Exception
 {
-    /// <summary>Bu exception için döndürülecek HTTP status kodu.</summary>
+    /// Bu exception için döndürülecek HTTP status kodu.
     public int StatusCode { get; }
 
     protected DomainException(string message, int statusCode = 400)

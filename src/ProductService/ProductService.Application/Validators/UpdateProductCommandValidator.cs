@@ -3,7 +3,7 @@ using ProductService.Application.Commands;
 
 namespace ProductService.Application.Validators;
 
-/// <summary>UpdateProductCommand için FluentValidation kuralları.</summary>
+/// UpdateProductCommand için FluentValidation kuralları.
 public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
     public UpdateProductCommandValidator()

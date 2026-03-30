@@ -5,11 +5,10 @@ using ProductService.Application.Behaviors;
 
 namespace ProductService.Application.Extensions;
 
-/// <summary>
+
 /// Application katmanı DI kayıt helper'ı.
 /// SRP: DI konfigürasyonu tek yerde toplanır.
 /// OCP: Yeni behavior / validator eklendiğinde bu metot değişmez.
-/// </summary>
 public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddProductApplication(this IServiceCollection services)

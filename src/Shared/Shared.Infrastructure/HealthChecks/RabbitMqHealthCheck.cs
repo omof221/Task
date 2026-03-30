@@ -3,10 +3,10 @@ using RabbitMQ.Client;
 
 namespace Shared.Infrastructure.HealthChecks;
 
-/// <summary>
+
 /// RabbitMQ bağlantısını kontrol eden health check.
 /// 12-Factor: Destek servislerinin sağlığı bağımsız olarak izlenir.
-/// </summary>
+
 public class RabbitMqHealthCheck : IHealthCheck
 {
     private readonly string _connectionString;

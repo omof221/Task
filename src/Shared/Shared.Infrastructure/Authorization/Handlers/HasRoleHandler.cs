@@ -5,7 +5,6 @@ using Shared.Infrastructure.Authorization.Requirements;
 
 namespace Shared.Infrastructure.Authorization.Handlers;
 
-/// <summary>
 /// HasRoleRequirement için custom IAuthorizationHandler implementasyonu.
 ///
 /// Standart RequireRole() yerine bu handler kullanılmasının nedenleri:
@@ -15,7 +14,6 @@ namespace Shared.Infrastructure.Authorization.Handlers;
 ///   4. DIP: ILogger arayüzüne bağımlı; somut logger sınıfına değil.
 ///
 /// SRP: Yalnızca rol doğrulama + loglama sorumluluğuna sahiptir.
-/// </summary>
 public sealed class HasRoleHandler : AuthorizationHandler<HasRoleRequirement>
 {
     private readonly ILogger<HasRoleHandler> _logger;

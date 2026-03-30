@@ -7,11 +7,11 @@ using ProductService.Application.Queries;
 
 namespace ProductService.API.Controllers;
 
-/// <summary>
+
 /// Ürün CRUD endpoint'leri.
 /// SRP: Yalnızca HTTP binding ve MediatR dispatch.
 /// CQRS: Command (write) ve Query (read) ayrıştırılmış.
-/// </summary>
+
 [ApiController]
 [Route("api/products")]
 [Produces("application/json")]
@@ -21,7 +21,7 @@ public class ProductController : ControllerBase
 
     public ProductController(IMediator mediator) => _mediator = mediator;
 
-    /// <summary>Tüm aktif ürünleri listeler — Redis cache-aside.</summary>
+    /// Tüm aktif ürünleri listeler — Redis cache-aside.</summary>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyList<ProductDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(CancellationToken ct)
@@ -30,7 +30,7 @@ public class ProductController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>ID'ye göre tek ürün getirir — Redis cache-aside.</summary>
+    /// ID'ye göre tek ürün getirir — Redis cache-aside.
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -40,11 +40,10 @@ public class ProductController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
+    
     /// Yeni ürün ekler.
     /// Event: ProductAddedEvent → RabbitMQ/Kafka → LogService.
     /// Cache Invalidation: ProductList cache silinir.
-    /// </summary>
     [HttpPost]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -57,12 +56,11 @@ public class ProductController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
-    /// <summary>
+
     /// Ürün günceller — "UserOrAdmin" policy gerektirir.
     /// Custom HasRoleHandler devreye girer; yetki kararı loglanır.
     /// Event: ProductUpdatedEvent → RabbitMQ/Kafka → LogService.
     /// Cache Invalidation: Hem liste hem tekil cache silinir.
-    /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Policy = "UserOrAdmin")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]

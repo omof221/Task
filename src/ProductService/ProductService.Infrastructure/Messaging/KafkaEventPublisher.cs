@@ -7,13 +7,12 @@ using System.Text.Json;
 
 namespace ProductService.Infrastructure.Messaging;
 
-/// <summary>
+
 /// IEventPublisher'ın Kafka implementasyonu (alternatif).
 /// OCP / DIP: RabbitMqEventPublisher ile aynı arayüzü implement eder.
 /// Program.cs'te hangisinin kullanılacağı konfigürasyonla seçilir:
 ///   "Messaging:Provider": "RabbitMQ" | "Kafka"
 /// Topic adı: event türünün adı (ör. "ProductAddedEvent")
-/// </summary>
 public sealed class KafkaEventPublisher : IEventPublisher, IDisposable
 {
     private readonly IProducer<string, string> _producer;
@@ -35,7 +34,7 @@ public sealed class KafkaEventPublisher : IEventPublisher, IDisposable
         var config = new ProducerConfig
         {
             BootstrapServers = bootstrapServers,
-            Acks             = Acks.All,  // En az bir lider + tüm ISR onayı
+            Acks             = Acks.All, 
             MessageTimeoutMs = 5000
         };
 

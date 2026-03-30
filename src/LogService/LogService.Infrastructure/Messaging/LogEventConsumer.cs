@@ -12,11 +12,10 @@ using RabbitMQ.Client.Events;
 
 namespace LogService.Infrastructure.Messaging;
 
-/// <summary>
+
 /// RabbitMQ'dan ProductAddedEvent / ProductUpdatedEvent tüketen background servisi.
 /// Event-Driven entegrasyon: ProductService → RabbitMQ → LogService → WriteLogCommand.
-/// IHostedService: uygulama başlangıcında otomatik başlar, kapanışta durur.
-/// </summary>
+
 public sealed class LogEventConsumer : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;

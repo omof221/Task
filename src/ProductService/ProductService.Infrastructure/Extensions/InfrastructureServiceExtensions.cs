@@ -10,11 +10,9 @@ using StackExchange.Redis;
 
 namespace ProductService.Infrastructure.Extensions;
 
-/// <summary>
 /// Infrastructure katmanı DI kayıt helper'ı.
 /// OCP / DIP: Yeni implementasyon eklendiğinde bu metot genişletilir;
 ///            Application katmanı değişmez.
-/// </summary>
 public static class InfrastructureServiceExtensions
 {
     public static IServiceCollection AddProductInfrastructure(
@@ -55,7 +53,6 @@ public static class InfrastructureServiceExtensions
         }
 
         // ── Event Publisher ───────────────────────────────────────
-        // "Messaging:Provider" = "RabbitMQ" | "Kafka"
         var messagingProvider = configuration["Messaging:Provider"] ?? "RabbitMQ";
 
         if (isTesting)

@@ -36,10 +36,10 @@ public class ProductWebApplicationFactory : WebApplicationFactory<Program>
     public string JwtSecret => TestJwtSecret;
 }
 
-/// <summary>
+
 /// ProductController integration testleri.
 /// Testing ortamı: InMemory DB + NullCache + NullEventPublisher.
-/// </summary>
+
 public class ProductControllerIntegrationTests
     : IClassFixture<ProductWebApplicationFactory>
 {

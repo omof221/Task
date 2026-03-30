@@ -3,13 +3,13 @@ using MediatR;
 
 namespace ProductService.Application.Behaviors;
 
-/// <summary>
+
 /// MediatR pipeline behavior — otomatik FluentValidation.
 /// SRP: Validation mantığı handler'lardan ayrıştırılır.
 /// OCP: Yeni validator eklendiğinde bu behavior değişmez.
 /// Handler çalışmadan önce tüm validator'lar tetiklenir;
 /// hata varsa ValidationException fırlatılır.
-/// </summary>
+
 public sealed class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

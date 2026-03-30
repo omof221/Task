@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Shared.Infrastructure.Authorization.Requirements;
 
-/// <summary>
 /// Custom Policy-Based Authorization gereksinimidir.
 /// Role-Based Authorization'dan farkı: bir veya birden fazla rolü
 /// tek bir gereksinim nesnesiyle temsil edebilir ve handler'da
@@ -11,10 +10,9 @@ namespace Shared.Infrastructure.Authorization.Requirements;
 /// ISP: Yalnızca rol bilgisini taşır; doğrulama mantığı handler'dadır.
 /// OCP: Yeni rol kombinasyonları bu sınıfı değiştirmeden
 ///      yeni HasRoleRequirement(...)  çağrısıyla eklenir.
-/// </summary>
 public sealed class HasRoleRequirement : IAuthorizationRequirement
 {
-    /// <summary>Bu gereksinimi karşılayan izin verilen roller.</summary>
+    /// Bu gereksinimi karşılayan izin verilen roller.
     public IReadOnlyList<string> AllowedRoles { get; }
 
     public HasRoleRequirement(params string[] allowedRoles)

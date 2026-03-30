@@ -4,10 +4,8 @@ using Shared.Domain.BaseEntities;
 
 namespace ProductService.Infrastructure.Persistence;
 
-/// <summary>
 /// ProductService EF Core DB context'i.
 /// 12-Factor IV: Veritabanı bağlantısı environment variable üzerinden gelir.
-/// </summary>
 public class ProductDbContext : DbContext
 {
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
@@ -40,10 +38,8 @@ public class ProductDbContext : DbContext
         });
     }
 
-    /// <summary>
     /// SaveChanges override — BaseEntity.UpdatedAt otomatik güncellenir.
     /// SRP: Audit mantığı context'te merkezi olarak yönetilir.
-    /// </summary>
     public override Task<int> SaveChangesAsync(CancellationToken ct = default)
     {
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())

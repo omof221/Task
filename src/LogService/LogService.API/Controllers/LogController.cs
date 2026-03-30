@@ -18,12 +18,7 @@ public sealed class LogController : ControllerBase
 
     public LogController(IMediator mediator) => _mediator = mediator;
 
-    /// <summary>
-    /// Yeni log kaydı oluşturur.
-    /// </summary>
-    /// <param name="request">Log isteği</param>
-    /// <param name="ct">Cancellation token</param>
-    /// <returns>Oluşturulan log kaydının ID'si</returns>
+  
     [HttpPost]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,7 +37,7 @@ public sealed class LogController : ControllerBase
     }
 }
 
-/// <summary>Log yazma isteği modeli.</summary>
+/// Log yazma isteği modeli.
 public record WriteLogRequest(
     AppLogLevel Level,
     string      Message,

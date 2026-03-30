@@ -1,6 +1,6 @@
 namespace ProductService.Application.DTOs;
 
-/// <summary>Ürün okuma DTO'su — domain entity'nin dışa açılan projeksiyonu.</summary>
+/// Ürün okuma DTO'su — domain entity'nin dışa açılan projeksiyonu
 public sealed record ProductDto(
     Guid Id,
     string Name,

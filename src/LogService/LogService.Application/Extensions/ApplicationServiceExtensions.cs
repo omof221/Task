@@ -2,11 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LogService.Application.Extensions;
 
-/// <summary>
+
 /// Application katmanı DI kayıt helper'ı.
-/// OCP: Yeni handler/behavior eklendiğinde bu metot değişmez;
-///       MediatR assembly taraması yeni handler'ı otomatik bulur.
-/// </summary>
+/// Yeni handler/behavior eklendiğinde bu metot değişmez;
+/// MediatR assembly taraması yeni handler'ı otomatik bulur.
+
 public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddLogApplication(this IServiceCollection services)

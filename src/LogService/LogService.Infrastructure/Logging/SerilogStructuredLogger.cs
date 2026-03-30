@@ -4,14 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace LogService.Infrastructure.Logging;
 
-/// <summary>
+
 /// IStructuredLogger'ın Serilog tabanlı implementasyonu.
 /// Level bazlı yönlendirme:
 ///   INFO / WARNING  → Seq (genel gözlemlenebilirlik)
 ///   ERROR / CRITICAL → ELK (alert + analiz)
 /// OCP: Yeni sink eklemek için bu sınıfı değiştirmeden
 ///      Serilog pipeline konfigürasyonu genişletilebilir.
-/// </summary>
+
 public sealed class SerilogStructuredLogger : IStructuredLogger
 {
     private readonly ILogger<SerilogStructuredLogger> _logger;

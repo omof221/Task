@@ -8,9 +8,7 @@ using ProductService.Domain.Entities;
 
 namespace ProductService.Tests.Unit;
 
-/// <summary>
 /// GetProductsQueryHandler unit testleri — Redis mock ile cache-aside doğrulaması.
-/// </summary>
 public class GetProductsQueryHandlerTests
 {
     private readonly Mock<IProductRepository> _repoMock;

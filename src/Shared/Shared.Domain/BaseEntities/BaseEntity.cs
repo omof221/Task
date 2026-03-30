@@ -1,10 +1,10 @@
 namespace Shared.Domain.BaseEntities;
 
-/// <summary>
+
 /// Tüm domain entity'lerinin türediği temel sınıf.
 /// Domain invariantları factory/update metotlarıyla korunur;
 /// EF Core'un property materialization'ı için setterlar public.
-/// </summary>
+
 public abstract class BaseEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

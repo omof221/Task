@@ -1,6 +1,6 @@
 namespace ProductService.Application.DTOs;
 
-/// <summary>Ürün oluşturma istek DTO'su.</summary>
+/// Ürün oluşturma istek DTO'su.
 public sealed record CreateProductRequest(
     string Name,
     string Description,

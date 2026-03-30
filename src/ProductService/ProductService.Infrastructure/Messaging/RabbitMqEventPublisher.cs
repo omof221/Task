@@ -8,13 +8,11 @@ using System.Text.Json;
 
 namespace ProductService.Infrastructure.Messaging;
 
-/// <summary>
 /// IEventPublisher'ın RabbitMQ implementasyonu (RabbitMQ.Client 7.x async API).
 /// OCP / DIP: KafkaEventPublisher aynı arayüzü implement eder;
 ///            DI'da hangisinin kullanılacağı konfigürasyonla belirlenir.
 /// Exchange: "product.events" (topic)
 /// Routing key: event türünün adı (ör. "ProductAddedEvent")
-/// </summary>
 public sealed class RabbitMqEventPublisher : IEventPublisher, IAsyncDisposable
 {
     private readonly ILogger<RabbitMqEventPublisher> _logger;

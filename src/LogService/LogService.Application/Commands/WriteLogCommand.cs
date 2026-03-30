@@ -3,10 +3,10 @@ using MediatR;
 
 namespace LogService.Application.Commands;
 
-/// <summary>
+
 /// Log kayıt komutu.
-/// SRP: yalnızca tek bir log yazma işlemi tanımlar.
-/// </summary>
+///  yalnızca tek bir log yazma işlemi tanımlar.
+
 public record WriteLogCommand(
     AppLogLevel Level,
     string      Message,

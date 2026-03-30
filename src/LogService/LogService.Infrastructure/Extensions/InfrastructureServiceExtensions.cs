@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace LogService.Infrastructure.Extensions;
 
-/// <summary>
+
 /// Infrastructure katmanı DI kayıt helper'ı.
 /// OCP / DIP: Yeni implementasyon eklendiğinde Application katmanı değişmez.
-/// </summary>
+
 public static class InfrastructureServiceExtensions
 {
     public static IServiceCollection AddLogInfrastructure(
